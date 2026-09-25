@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>美術館NOTE v0.9</title>
+<title>美術館NOTE v0.12</title>
 <style>
 *{box-sizing:border-box}
 body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:#f5f3ef;color:#272522}
@@ -199,7 +199,7 @@ ${visitText(r)}
  copyText(t,'壁打ち用メモをコピーしました。人生リブート計画のちゃぴこに貼り付けてください。');
 }
 function downloadMarkdown(filename, text){
-  const blob=new Blob(["\\ufeff"+text],{type:'text/markdown;charset=utf-8'});
+  const blob=new Blob(["\ufeff"+text],{type:'text/markdown;charset=utf-8'});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
   a.href=url;
@@ -210,7 +210,8 @@ function downloadMarkdown(filename, text){
   setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
 function mdSafe(s){
-  return String(s??'').replace(/\\/g,'\\\\').replace(/\r?\n/g,'<br>');
+  // Markdown出力では、元の改行をそのまま改行として保持する。
+  return String(s??'').replace(/\r\n/g,'\n').replace(/\r/g,'\n');
 }
 function rebootAll(){
  const records=get().slice().sort((a,b)=>{
@@ -223,7 +224,7 @@ function rebootAll(){
 **展覧会：** ${mdSafe(r.exhibition||'常設・館内')}
 
 ### 感想・メモ
-${r.notes.map(n=>`- ${mdSafe(n)}`).join('\\n')}`).join('\\n\\n---\\n\\n');
+${r.notes.map(n=>`- ${mdSafe(n)}`).join('\n')}`).join('\n\n---\n\n');
  const t=`# REBOOT 56へ送る／美術館NOTE 全体
 
 以下は、これまでの美術館・博物館体験の記録です。
