@@ -41,7 +41,7 @@ button.primary{background:#26231f;color:#fff}
 
 <main class="wrap" id="list"></main>
 <div class="bottom-actions">
-<button class="reboot-btn" onclick="rebootAll()">🚀 REBOOT 56へ送る</button>
+<button class="reboot-btn" onclick="rebootAll()">🚀 REBOOT 56へ送る（MD）</button>
 <button class="fab primary" onclick="openSheet()">＋ 今日の記録</button>
 </div>
 
@@ -198,35 +198,64 @@ ${visitText(r)}
 結論を急がず、会話しながら掘り下げてください。`;
  copyText(t,'壁打ち用メモをコピーしました。人生リブート計画のちゃぴこに貼り付けてください。');
 }
+function downloadMarkdown(filename, text){
+  const blob=new Blob(["\\ufeff"+text],{type:'text/markdown;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download=filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+function mdSafe(s){
+  return String(s??'').replace(/\\/g,'\\\\').replace(/\r?\n/g,'<br>');
+}
 function rebootAll(){
  const records=get().slice().sort((a,b)=>{
    const dc=(a.date||'').localeCompare(b.date||'');
    return dc || (a.place||'').localeCompare(b.place||'','ja');
  });
  if(!records.length){alert('まだ美術館NOTEの記録がありません。');return;}
- const body=records.map((r,i)=>`【${i+1}】
-${visitText(r)}`).join('\n\n====================\n\n');
- const t=`【REBOOT 56へ送る／美術館NOTE 全体】
+ const body=records.map((r,i)=>`## ${i+1}. ${mdSafe(r.place)} — ${mdSafe(r.date)}
+
+**展覧会：** ${mdSafe(r.exhibition||'常設・館内')}
+
+### 感想・メモ
+${r.notes.map(n=>`- ${mdSafe(n)}`).join('\\n')}`).join('\\n\\n---\\n\\n');
+ const t=`# REBOOT 56へ送る／美術館NOTE 全体
 
 以下は、これまでの美術館・博物館体験の記録です。
 
 ${body}
 
-====================
+---
+
+## REBOOT 56への振り返り依頼
 
 この記録全体を「人生リブート計画（REBOOT 56）」の活動として整理してください。
 個々の訪問を単発でまとめるのではなく、これまでの体験を横断して、私の興味・学びの変化やつながりを読み取ってください。
+
 特に、
-・繰り返し現れている興味やテーマ
-・最近になって広がってきた関心
-・美術館・博物館体験から見えてくる「私が面白いと感じるもの」
-・浮世絵、日本文化、歴史、科学、建築、時計など他のREBOOT 56の活動とのつながり
-・これから深掘りすると面白そうなテーマや次の行動
+- 繰り返し現れている興味やテーマ
+- 最近になって広がってきた関心
+- 美術館・博物館体験から見えてくる「私が面白いと感じるもの」
+- 浮世絵、日本文化、歴史、科学、建築、時計など他のREBOOT 56の活動とのつながり
+- これから深掘りすると面白そうなテーマや次の行動
+
 を、私の記録と言葉をできるだけ尊重しながら整理してください。
 単なる訪問履歴ではなく、「人生リブート計画の中で美術館・博物館巡りがどう育ってきたか」が見えるようにしてください。
-必要なら、時系列での変化とテーマ別のつながりの両方を示してください。`;
- copyText(t,'美術館NOTE全体のREBOOT 56送信用メモをコピーしました。REBOOT 56のちゃぴこに貼り付けてください。');
+必要なら、時系列での変化とテーマ別のつながりの両方を示してください。
+`;
+ const d=new Date();
+ const y=d.getFullYear();
+ const m=String(d.getMonth()+1).padStart(2,'0');
+ const day=String(d.getDate()).padStart(2,'0');
+ downloadMarkdown(`美術館NOTE_REBOOT56_${y}-${m}-${day}.md`,t);
+ alert('REBOOT 56用のMarkdownファイルを作成しました。ダウンロードしたMDファイルをREBOOT 56のチャットに添付してください。');
 }
+
 document.getElementById('search').addEventListener('input',render);
 document.getElementById('museumFilter').addEventListener('change',render);
 render();
