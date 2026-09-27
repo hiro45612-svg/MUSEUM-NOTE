@@ -37,12 +37,36 @@ button.primary{background:#26231f;color:#fff}
 <div class="hint">同じ館でも、日付または展覧会が違えば別の訪問として記録します。保存後も「✏️ 再編集」で修正できます。</div>
 <div class="hint">🧠 壁打ち＝ちゃぴこと考えるためのメモ、🚀 REBOOT 56＝人生リブート計画へつなぐ振り返りメモをコピーします。</div>
 <div class="hint" id="count"></div>
+    <div class="hint" id="cloudStatus">☁️ クラウド：未設定</div>
+<div class="actions" style="justify-content:flex-start">
+  <button id="authBtn" onclick="openAuth()">☁️ クラウド設定・ログイン</button>
+  <button id="syncBtn" onclick="syncNow()" style="display:none">🔄 今すぐ同期</button>
+  <button id="logoutBtn" onclick="logoutCloud()" style="display:none">ログアウト</button>
+</div>
 </div></header>
 
 <main class="wrap" id="list"></main>
 <div class="bottom-actions">
 <button class="reboot-btn" onclick="rebootAll()">🚀 REBOOT 56へ送る（MD）</button>
 <button class="fab primary" onclick="openSheet()">＋ 今日の記録</button>
+</div>
+
+
+<div class="modal" id="authModal" onclick="if(event.target===this)closeAuth()">
+ <div class="sheet">
+  <h2>☁️ 美術館NOTE クラウド同期</h2>
+  <div class="hint">BRAND NOTEと同じSupabaseアカウントを使うこともできます。初回だけログイン設定をしてください。</div>
+  <div class="grid">
+    <input id="authEmail" type="email" placeholder="メールアドレス">
+    <input id="authPassword" type="password" placeholder="パスワード">
+  </div>
+  <div class="actions">
+    <button onclick="closeAuth()">閉じる</button>
+    <button onclick="signUpCloud()">新規登録</button>
+    <button class="primary" onclick="signInCloud()">ログイン</button>
+  </div>
+  <div class="hint" id="authMessage"></div>
+ </div>
 </div>
 
 <div class="modal" id="modal" onclick="if(event.target===this)closeSheet()">
@@ -62,6 +86,12 @@ button.primary{background:#26231f;color:#fff}
 <button class="primary" onclick="saveMemo()">保存する</button>
 </div>
 </div></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+window.MUSEUM_SUPABASE_URL = "https://ygumbshoornicgymerny.supabase.co";
+window.MUSEUM_SUPABASE_PUBLISHABLE_KEY = "sb_publishable_d9dB4fyWNwgVKWLsV0PEMQ_xAvVi5wR";
+</script>
 
 <script>
 const initial = [{"id": "v1", "date": "2026-07-20", "place": "東京国立博物館", "exhibition": "", "notes": ["東博コレクション2階", "まず、収蔵が12万点あり、そのうち3000点展示して、入れ替えてるのにびっくり。", "遮光器土偶　不思議な形状。", "しぶんかいほんならびじょ　奈良時代の写経とのことですがホンモノ？字があることで、文化を後年に伝えることができますね", "和歌体十種　平安時代にひらがなが発達した", "十二天図像　白描図像　アニメの設定図みたいです。おもしろ", "16室のラウンジまで来ました。甲冑や刀は人気ありますね。若い女の子が議論してます", "牡丹錦鶏蒔絵鞍鐙　馬にのる鞍にこのような技巧が凝らされたのですね。", "波千鳥蒔絵提重　カッコよくて素敵です。蒔絵とは？千鳥と波のデザインは尾形光琳の影響とか。流行だったのですかね", "猿猴図　テナガザルびっくりするくらいかわいい。漫画ですね", "能と歌舞伎のコーナーが1番賑わってます。海外のかたが、歌舞伎の映像見入ってます。展示品は狂言特集ですが", "勝川春章　朝比奈門破り　みてます。すごい繊細なのですが、ほんとに版画？", "一通りみました。2時間ぐらいかかりましたね。今日はここまでで。法隆寺館はまた次の機会で。\n\n感想　繊細だったり、ユーモラスだったり、ミニマルだったり、日本人の感性や価値観を理解するのに、とても楽しい展示です。", "1番心にのこったもの　猿猴図　ちょっと可愛すぎ　昔のセンスに見えませんでした"]}, {"id": "v2", "date": "2026-07-26", "place": "セイコーミュージアム", "exhibition": "", "notes": ["精工舎がセイコーの由来", "セイコーになったのは1997年", "だから、服部時計店も聞き覚えがあった", "和時計カッコいい　不定時法に対応するように、目盛が複雑", "昔からデザイン凝っていた", "イロイロなスポーツ用の個別のストップウォッチがあった", "日時計からクォーツに、至るまでの時計の歴史を学べた。クォーツなんて何故思いついたか、と思いました"]}, {"id": "v3", "date": "2026-08-10", "place": "国立科学博物館", "exhibition": "", "notes": ["地球館　1階", "たくさんの生物の剥製　生物は全て一つの種から多様に進化した", "b1階", "有名な恐竜の骨格標本など、　イメージは昔と変わってますよね。トリケラトプスに毛が生えてるとか", "B2", "多数の化石　生物誕生の歴史の証拠　何故化石は見事にかたちを残しているのか　人類の化石も多数", "b3", "様々な科学に触れられる。加速器のモックアップや、光速測定の機械など", "2階", "科学　人工衛星　潜水艦　蒸気機関など", "3階", "動物の剥製　鳥の剥製も多数"]}, {"id": "v4", "date": "2026-08-10", "place": "旧東京音楽学校奏楽堂", "exhibition": "", "notes": ["オルガン：高田 のぞみ\n（東京藝術大学大学院修士課程古楽科）\nH. パーセル：\n時節第100篇によるヴォランタリー イ長調\nF. リスト：\nアルカデルトのアヴェ・マリア　S.183\nF. リスト＝C. サン＝サーンス編：\n小鳥に説教するアッシジの聖フランチェスコ\nS.175/1（「伝説」より）\nL. ヴィエルヌ：\nオルガンまたはハルモニウムのための\n《自由な様式による24の小品》\n第2集 作品31より\n伝説\nアラベスク\nポストリュード（後奏曲）"]}, {"id": "v5", "date": "2026-08-11", "place": "東京江戸博物館", "exhibition": "", "notes": ["リニューアル後初めて", "江戸城の模型が大迫力で分かりやすい", "明暦の大火　回向院", "徳川将軍の葬地は多岐にわたる　日光は家康　上野は綱吉　吉宗など", "不定時法の紹介がある", "印刷技術すごい。錦絵美しい", "貨幣の改鋳の話も書いてありました", "上野戦争の解説ありました", "上水の土木技術すごいです", "中村座の模型すごい。このような芝居小屋をよく設計して作ったものです。"]}, {"id": "v6", "date": "46247", "place": "太田記念美術館", "exhibition": "アニマル＆モンスター展", "notes": ["アニマル＆モンスター展", "「江戸の人の遊び方」が見えて、とても楽しかった。国芳「桑名 船乗徳蔵」の海坊主が特にかっこよかった。「新板ねこの手ならひ師匠」では猫を、「青物魚軍勢大合戦の図」では魚や野菜を擬人化し、何でも合戦や人間社会に見立ててしまう江戸のナンセンスとユーモアに驚いた。浮世絵は絵師だけでなく、彫師・摺師・版元による分業で作られること、「画稿」が版画制作のための原画・下絵であることも知った。歌川派の絵師が多いこと、「新板」が新しい出版・版を意味することも理解できた。安永と明治の作品では色の鮮やかさにも違いを感じ、明治の新しい顔料・染料や近代化にも興味を持った。浮世絵は江戸で終わらず明治にも続き、写真や新しい印刷技術の普及とともに役割を変えていったことも印象に残った。200年近く前の版画が良好な状態で残り、江戸の人々と同じように『海坊主かっこいい！』と楽しめることが面白い。"]}];
@@ -161,11 +191,11 @@ function saveMemo(){
  const data=get();
  if(id){
    const r=data.find(x=>x.id===id);
-   if(r){r.date=d;r.place=p;r.exhibition=e;r.notes=notes}
+   if(r){r.date=d;r.place=p;r.exhibition=e;r.notes=notes;r.updatedAt=Date.now()}
  }else{
    // 同じ訪問×展覧会ならメモを追記。日付・館・展覧会のいずれかが違えば新しい記録。
    let r=data.find(x=>x.date===d&&x.place===p&&x.exhibition===e);
-   if(!r){r={id:'v'+Date.now(),date:d,place:p,exhibition:e,notes:[]};data.push(r)}
+   if(!r){r={id:'v'+Date.now(),date:d,place:p,exhibition:e,notes:[],updatedAt:Date.now()};data.push(r)}
    r.notes.push(...notes);
  }
  set(data);closeSheet();render();
@@ -257,9 +287,204 @@ ${body}
  alert('REBOOT 56用のMarkdownファイルを作成しました。ダウンロードしたMDファイルをREBOOT 56のチャットに添付してください。');
 }
 
+
+// ===== v0.13 Cloud Sync =====
+const CLOUD_TABLE = 'museum_note_data';
+let cloudUser = null;
+let cloudReady = false;
+
+function cloudConfigured(){
+  return (typeof window.supabase !== 'undefined' || typeof supabase !== 'undefined') &&
+    window.MUSEUM_SUPABASE_URL &&
+    window.MUSEUM_SUPABASE_PUBLISHABLE_KEY &&
+    !String(window.MUSEUM_SUPABASE_URL).includes('YOUR_');
+}
+
+let sb = null;
+if(cloudConfigured()){
+  const createClient = window.supabase?.createClient || supabase?.createClient;
+  sb = createClient(
+    window.MUSEUM_SUPABASE_URL,
+    window.MUSEUM_SUPABASE_PUBLISHABLE_KEY,
+    {auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}
+  );
+}
+
+function setCloudStatus(text){
+  const el=document.getElementById('cloudStatus');
+  if(el) el.textContent=text;
+}
+function openAuth(){
+  document.getElementById('authModal').style.display='block';
+  document.getElementById('authMessage').textContent='';
+}
+function closeAuth(){document.getElementById('authModal').style.display='none'}
+
+async function signUpCloud(){
+  if(!sb){alert('supabase-config.js の設定がまだです。');return;}
+  const email=document.getElementById('authEmail').value.trim();
+  const password=document.getElementById('authPassword').value;
+  if(!email||!password){alert('メールアドレスとパスワードを入力してください。');return;}
+  const {error}=await sb.auth.signUp({email,password});
+  document.getElementById('authMessage').textContent=error ? '登録エラー：'+error.message : '登録しました。確認メールが届く設定の場合は、メール確認後にログインしてください。';
+}
+async function signInCloud(){
+  if(!sb){alert('supabase-config.js の設定がまだです。');return;}
+  const email=document.getElementById('authEmail').value.trim();
+  const password=document.getElementById('authPassword').value;
+  if(!email||!password){alert('メールアドレスとパスワードを入力してください。');return;}
+  const {data,error}=await sb.auth.signInWithPassword({email,password});
+  if(error){
+    document.getElementById('authMessage').textContent='ログインエラー：'+error.message;
+    return;
+  }
+  cloudUser=data.user;
+  closeAuth();
+  await initializeCloud();
+}
+async function logoutCloud(){
+  if(!sb)return;
+  await sb.auth.signOut();
+  cloudUser=null; cloudReady=false;
+  document.getElementById('authBtn').style.display='';
+  document.getElementById('syncBtn').style.display='none';
+  document.getElementById('logoutBtn').style.display='none';
+  setCloudStatus('☁️ クラウド：ログアウト中（この端末のローカル保存は残ります）');
+}
+
+function recordStamp(r){
+  return Number(r.updatedAt||0) || 0;
+}
+function normalizeRecords(arr){
+  return (Array.isArray(arr)?arr:[]).map(r=>({
+    id:String(r.id),
+    date:r.date||'',
+    place:r.place||'',
+    exhibition:r.exhibition||'',
+    notes:Array.isArray(r.notes)?r.notes:[],
+    updatedAt:Number(r.updatedAt||0)||0
+  }));
+}
+function mergeRecords(local, cloud){
+  const map=new Map();
+  for(const r of normalizeRecords(cloud)) map.set(r.id,r);
+  for(const r of normalizeRecords(local)){
+    const old=map.get(r.id);
+    if(!old || recordStamp(r)>=recordStamp(old)) map.set(r.id,r);
+  }
+  return [...map.values()];
+}
+
+async function pullCloud(){
+  const {data,error}=await sb.from(CLOUD_TABLE)
+    .select('records,updated_at')
+    .eq('user_id',cloudUser.id)
+    .maybeSingle();
+  if(error) throw error;
+  return data;
+}
+
+async function pushCloud(records){
+  const payload={
+    user_id:cloudUser.id,
+    records:normalizeRecords(records),
+    updated_at:new Date().toISOString()
+  };
+  const {error}=await sb.from(CLOUD_TABLE).upsert(payload,{onConflict:'user_id'});
+  if(error) throw error;
+}
+
+async function initializeCloud(){
+  if(!sb || !cloudUser)return;
+  cloudReady=false;
+  setCloudStatus('☁️ クラウド：同期確認中…');
+  try{
+    const row=await pullCloud();
+    const local=normalizeRecords(get());
+    const cloud=normalizeRecords(row?.records||[]);
+    const merged=mergeRecords(local,cloud);
+    set(merged);
+    await pushCloud(merged);
+    cloudReady=true;
+    document.getElementById('authBtn').style.display='none';
+    document.getElementById('syncBtn').style.display='';
+    document.getElementById('logoutBtn').style.display='';
+    setCloudStatus(`☁️ クラウド：同期済み　${merged.length}件`);
+    render();
+  }catch(e){
+    console.error(e);
+    setCloudStatus('☁️ クラウド：同期エラー（設定を確認）');
+    alert('クラウド同期でエラーが発生しました。\n\n'+e.message);
+  }
+}
+
+async function syncNow(){
+  if(!sb||!cloudUser){openAuth();return;}
+  const local=normalizeRecords(get());
+  try{
+    const row=await pullCloud();
+    const merged=mergeRecords(local,normalizeRecords(row?.records||[]));
+    set(merged);
+    await pushCloud(merged);
+    render();
+    setCloudStatus(`☁️ クラウド：同期済み　${merged.length}件`);
+    alert(`同期しました。\n訪問記録：${merged.length}件`);
+  }catch(e){
+    console.error(e);
+    alert('同期できませんでした。\n\n'+e.message);
+  }
+}
+
+// v0.13: localStorageへの保存をクラウド同期可能な形にする。
+// ローカル保存を先に行い、ログイン中ならクラウドへ反映。
+const _setOriginal=set;
+set=function(x){
+  const withStamp=normalizeRecords(x).map(r=>{
+    if(!r.updatedAt) r.updatedAt=Date.now();
+    return r;
+  });
+  _setOriginal(withStamp);
+  if(sb && cloudUser){
+    pushCloud(withStamp).then(()=>{
+      setCloudStatus(`☁️ クラウド：同期済み　${withStamp.length}件`);
+    }).catch(e=>{
+      console.error(e);
+      setCloudStatus('☁️ クラウド：保存待ち（再同期してください）');
+    });
+  }
+};
+
+// If an existing v0.12 local dataset is present, it is preserved and merged on login.
+// On first load, do not upload anything until the user explicitly logs in.
+async function bootCloud(){
+  if(!cloudConfigured()){
+    setCloudStatus('☁️ クラウド：未設定（v0.12ローカル保存で動作中）');
+    return;
+  }
+  try{
+    const {data}=await sb.auth.getSession();
+    if(data?.session?.user){
+      cloudUser=data.session.user;
+      await initializeCloud();
+    }else{
+      setCloudStatus('☁️ クラウド：未ログイン');
+    }
+    sb.auth.onAuthStateChange((_event,session)=>{
+      if(session?.user && !cloudUser){
+        cloudUser=session.user;
+        initializeCloud();
+      }
+    });
+  }catch(e){
+    console.error(e);
+    setCloudStatus('☁️ クラウド：接続確認エラー');
+  }
+}
+
 document.getElementById('search').addEventListener('input',render);
 document.getElementById('museumFilter').addEventListener('change',render);
 render();
+bootCloud();
 </script>
 </body>
 </html>
