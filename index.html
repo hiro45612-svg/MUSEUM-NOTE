@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>美術館NOTE v0.12</title>
+<title>美術館NOTE v0.14</title>
 <style>
 *{box-sizing:border-box}
 body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:#f5f3ef;color:#272522}
@@ -34,7 +34,7 @@ button.primary{background:#26231f;color:#fff}
 <input id="search" placeholder="美術館・展示・感想を検索…">
 <select id="museumFilter"><option value="">すべての館</option></select>
 </div>
-<div class="hint">同じ館でも、日付または展覧会が違えば別の訪問として記録します。保存後も「✏️ 再編集」で修正できます。</div>
+<div class="hint">同じ館の別の日・別イベントは、必ず別の「訪問記録」として保存します。既存記録への追記は「✏️ 再編集」から行います。</div>
 <div class="hint">🧠 壁打ち＝ちゃぴこと考えるためのメモ、🚀 REBOOT 56＝人生リブート計画へつなぐ振り返りメモをコピーします。</div>
 <div class="hint" id="count"></div>
     <div class="hint" id="cloudStatus">☁️ クラウド：未設定</div>
@@ -88,10 +88,7 @@ button.primary{background:#26231f;color:#fff}
 </div></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-window.MUSEUM_SUPABASE_URL = "https://ygumbshoornicgymerny.supabase.co";
-window.MUSEUM_SUPABASE_PUBLISHABLE_KEY = "sb_publishable_d9dB4fyWNwgVKWLsV0PEMQ_xAvVi5wR";
-</script>
+<script src="supabase-config.js"></script>
 
 <script>
 const initial = [{"id": "v1", "date": "2026-07-20", "place": "東京国立博物館", "exhibition": "", "notes": ["東博コレクション2階", "まず、収蔵が12万点あり、そのうち3000点展示して、入れ替えてるのにびっくり。", "遮光器土偶　不思議な形状。", "しぶんかいほんならびじょ　奈良時代の写経とのことですがホンモノ？字があることで、文化を後年に伝えることができますね", "和歌体十種　平安時代にひらがなが発達した", "十二天図像　白描図像　アニメの設定図みたいです。おもしろ", "16室のラウンジまで来ました。甲冑や刀は人気ありますね。若い女の子が議論してます", "牡丹錦鶏蒔絵鞍鐙　馬にのる鞍にこのような技巧が凝らされたのですね。", "波千鳥蒔絵提重　カッコよくて素敵です。蒔絵とは？千鳥と波のデザインは尾形光琳の影響とか。流行だったのですかね", "猿猴図　テナガザルびっくりするくらいかわいい。漫画ですね", "能と歌舞伎のコーナーが1番賑わってます。海外のかたが、歌舞伎の映像見入ってます。展示品は狂言特集ですが", "勝川春章　朝比奈門破り　みてます。すごい繊細なのですが、ほんとに版画？", "一通りみました。2時間ぐらいかかりましたね。今日はここまでで。法隆寺館はまた次の機会で。\n\n感想　繊細だったり、ユーモラスだったり、ミニマルだったり、日本人の感性や価値観を理解するのに、とても楽しい展示です。", "1番心にのこったもの　猿猴図　ちょっと可愛すぎ　昔のセンスに見えませんでした"]}, {"id": "v2", "date": "2026-07-26", "place": "セイコーミュージアム", "exhibition": "", "notes": ["精工舎がセイコーの由来", "セイコーになったのは1997年", "だから、服部時計店も聞き覚えがあった", "和時計カッコいい　不定時法に対応するように、目盛が複雑", "昔からデザイン凝っていた", "イロイロなスポーツ用の個別のストップウォッチがあった", "日時計からクォーツに、至るまでの時計の歴史を学べた。クォーツなんて何故思いついたか、と思いました"]}, {"id": "v3", "date": "2026-08-10", "place": "国立科学博物館", "exhibition": "", "notes": ["地球館　1階", "たくさんの生物の剥製　生物は全て一つの種から多様に進化した", "b1階", "有名な恐竜の骨格標本など、　イメージは昔と変わってますよね。トリケラトプスに毛が生えてるとか", "B2", "多数の化石　生物誕生の歴史の証拠　何故化石は見事にかたちを残しているのか　人類の化石も多数", "b3", "様々な科学に触れられる。加速器のモックアップや、光速測定の機械など", "2階", "科学　人工衛星　潜水艦　蒸気機関など", "3階", "動物の剥製　鳥の剥製も多数"]}, {"id": "v4", "date": "2026-08-10", "place": "旧東京音楽学校奏楽堂", "exhibition": "", "notes": ["オルガン：高田 のぞみ\n（東京藝術大学大学院修士課程古楽科）\nH. パーセル：\n時節第100篇によるヴォランタリー イ長調\nF. リスト：\nアルカデルトのアヴェ・マリア　S.183\nF. リスト＝C. サン＝サーンス編：\n小鳥に説教するアッシジの聖フランチェスコ\nS.175/1（「伝説」より）\nL. ヴィエルヌ：\nオルガンまたはハルモニウムのための\n《自由な様式による24の小品》\n第2集 作品31より\n伝説\nアラベスク\nポストリュード（後奏曲）"]}, {"id": "v5", "date": "2026-08-11", "place": "東京江戸博物館", "exhibition": "", "notes": ["リニューアル後初めて", "江戸城の模型が大迫力で分かりやすい", "明暦の大火　回向院", "徳川将軍の葬地は多岐にわたる　日光は家康　上野は綱吉　吉宗など", "不定時法の紹介がある", "印刷技術すごい。錦絵美しい", "貨幣の改鋳の話も書いてありました", "上野戦争の解説ありました", "上水の土木技術すごいです", "中村座の模型すごい。このような芝居小屋をよく設計して作ったものです。"]}, {"id": "v6", "date": "46247", "place": "太田記念美術館", "exhibition": "アニマル＆モンスター展", "notes": ["アニマル＆モンスター展", "「江戸の人の遊び方」が見えて、とても楽しかった。国芳「桑名 船乗徳蔵」の海坊主が特にかっこよかった。「新板ねこの手ならひ師匠」では猫を、「青物魚軍勢大合戦の図」では魚や野菜を擬人化し、何でも合戦や人間社会に見立ててしまう江戸のナンセンスとユーモアに驚いた。浮世絵は絵師だけでなく、彫師・摺師・版元による分業で作られること、「画稿」が版画制作のための原画・下絵であることも知った。歌川派の絵師が多いこと、「新板」が新しい出版・版を意味することも理解できた。安永と明治の作品では色の鮮やかさにも違いを感じ、明治の新しい顔料・染料や近代化にも興味を持った。浮世絵は江戸で終わらず明治にも続き、写真や新しい印刷技術の普及とともに役割を変えていったことも印象に残った。200年近く前の版画が良好な状態で残り、江戸の人々と同じように『海坊主かっこいい！』と楽しめることが面白い。"]}];
@@ -190,13 +187,21 @@ function saveMemo(){
  if(!p){alert('美術館・博物館名を入れてください');return}
  const data=get();
  if(id){
+   // 再編集は、選択した訪問記録そのものだけを更新する。
    const r=data.find(x=>x.id===id);
    if(r){r.date=d;r.place=p;r.exhibition=e;r.notes=notes;r.updatedAt=Date.now()}
  }else{
-   // 同じ訪問×展覧会ならメモを追記。日付・館・展覧会のいずれかが違えば新しい記録。
-   let r=data.find(x=>x.date===d&&x.place===p&&x.exhibition===e);
-   if(!r){r={id:'v'+Date.now(),date:d,place:p,exhibition:e,notes:[],updatedAt:Date.now()};data.push(r)}
-   r.notes.push(...notes);
+   // 新規入力は必ず「新しい訪問」として保存する。
+   // 同じ館・同じ日・同じ展覧会でも既存レコードを探して上書きしない。
+   const r={
+     id:'v'+Date.now()+'_'+Math.random().toString(36).slice(2,8),
+     date:d,
+     place:p,
+     exhibition:e,
+     notes,
+     updatedAt:Date.now()
+   };
+   data.push(r);
  }
  set(data);closeSheet();render();
 }
@@ -294,7 +299,7 @@ let cloudUser = null;
 let cloudReady = false;
 
 function cloudConfigured(){
-  return (typeof window.supabase !== 'undefined' || typeof supabase !== 'undefined') &&
+  return typeof window.supabase !== 'undefined' &&
     window.MUSEUM_SUPABASE_URL &&
     window.MUSEUM_SUPABASE_PUBLISHABLE_KEY &&
     !String(window.MUSEUM_SUPABASE_URL).includes('YOUR_');
@@ -302,8 +307,7 @@ function cloudConfigured(){
 
 let sb = null;
 if(cloudConfigured()){
-  const createClient = window.supabase?.createClient || supabase?.createClient;
-  sb = createClient(
+  sb = window.supabase.createClient(
     window.MUSEUM_SUPABASE_URL,
     window.MUSEUM_SUPABASE_PUBLISHABLE_KEY,
     {auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}}
@@ -439,6 +443,11 @@ async function syncNow(){
 // ローカル保存を先に行い、ログイン中ならクラウドへ反映。
 const _setOriginal=set;
 set=function(x){
+  // 変更前のローカルデータをバックアップ。誤操作・更新時の復旧用。
+  try{
+    const before=localStorage.getItem(key);
+    if(before) localStorage.setItem(key+'_backup',before);
+  }catch(e){console.warn('local backup failed',e)}
   const withStamp=normalizeRecords(x).map(r=>{
     if(!r.updatedAt) r.updatedAt=Date.now();
     return r;
