@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>美術館NOTE v0.16</title>
+<title>美術館NOTE v0.17</title>
 <style>
 *{box-sizing:border-box}
 body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:#f5f3ef;color:#272522}
@@ -320,7 +320,7 @@ ${body}
 }
 
 
-// ===== v0.13 Cloud Sync =====
+// ===== v0.17 Cloud Sync / automatic refresh =====
 const CLOUD_TABLE = 'museum_note_data';
 let cloudUser = null;
 let cloudReady = false;
@@ -465,6 +465,39 @@ async function syncNow(){
     alert('同期できませんでした。\n\n'+e.message);
   }
 }
+
+// v0.17: PCで更新された内容を、スマートフォンを開いたときに自動反映する。
+// 手動の「今すぐ同期」も引き続き利用可能。
+let autoSyncBusy=false;
+async function refreshFromCloudSilently(){
+  if(!sb || !cloudUser || autoSyncBusy) return;
+  autoSyncBusy=true;
+  try{
+    const row=await pullCloud();
+    const local=normalizeRecords(get());
+    const cloud=normalizeRecords(row?.records||[]);
+    const merged=mergeRecords(local,cloud);
+
+    // 実際に内容が変わった場合だけローカルへ反映。
+    const localJson=JSON.stringify(local);
+    const mergedJson=JSON.stringify(merged);
+    if(localJson!==mergedJson){
+      _setOriginal(merged);
+      render();
+    }
+    setCloudStatus(`☁️ クラウド：同期済み　${merged.length}件`);
+  }catch(e){
+    console.error(e);
+    setCloudStatus('☁️ クラウド：接続確認中（再試行できます）');
+  }finally{
+    autoSyncBusy=false;
+  }
+}
+
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='visible') refreshFromCloudSilently();
+});
+window.addEventListener('focus',()=>refreshFromCloudSilently());
 
 // v0.13: localStorageへの保存をクラウド同期可能な形にする。
 // ローカル保存を先に行い、ログイン中ならクラウドへ反映。
