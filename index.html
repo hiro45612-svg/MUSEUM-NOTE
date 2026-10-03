@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>美術館NOTE v0.14</title>
+<title>美術館NOTE v0.15</title>
 <style>
 *{box-sizing:border-box}
 body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:#f5f3ef;color:#272522}
 header{padding:18px 18px 10px;position:sticky;top:0;background:#f5f3efee;backdrop-filter:blur(8px);z-index:2}
 h1{margin:0;font-size:25px}.sub{color:#777;font-size:13px;margin-top:4px}
-.wrap{max-width:760px;margin:auto;padding:8px 14px 100px}
-.toolbar{display:flex;gap:8px;margin:10px 0}.toolbar input{flex:1}
+.wrap{max-width:760px;margin:auto;padding:8px 14px 120px}
+.toolbar{display:flex;gap:8px;margin:10px 0}.toolbar input{flex:1;min-width:0}.toolbar select{min-width:0}
 input,textarea,select{width:100%;border:1px solid #ddd5ca;border-radius:12px;padding:11px;font:inherit;background:white}
 button{border:0;border-radius:12px;padding:10px 13px;font:inherit;cursor:pointer;background:#e8e2d9}
 button.primary{background:#26231f;color:#fff}
@@ -18,7 +18,29 @@ button.primary{background:#26231f;color:#fff}
 .meta{font-size:12px;color:#7b746b}.place{font-size:18px;font-weight:700;margin:3px 0 8px}
 .memo{white-space:pre-wrap;line-height:1.65;margin:5px 0}.hint{font-size:12px;color:#777;margin:4px 0 12px}
 .empty{padding:35px 10px;text-align:center;color:#888}
-.fab{position:fixed;right:20px;bottom:20px;border-radius:999px;padding:15px 19px;box-shadow:0 5px 20px #0003}.reboot-btn{position:fixed;left:20px;bottom:20px;border-radius:999px;padding:13px 17px;box-shadow:0 5px 20px #0003;background:#e8e2d9;z-index:3}.bottom-actions{position:relative} @media(max-width:560px){.reboot-btn{left:12px;bottom:14px;padding:11px 13px;font-size:13px}.fab{right:12px;bottom:14px;padding:13px 15px;font-size:13px}}
+.settings{margin-top:8px}.settings summary{cursor:pointer;color:#777;font-size:12px;padding:5px 0;list-style:none}.settings summary::-webkit-details-marker{display:none}.settings summary::before{content:"⚙️ ";}.settings[open] summary{margin-bottom:6px}
+.fab{position:fixed;right:20px;bottom:20px;border-radius:999px;padding:15px 19px;box-shadow:0 5px 20px #0003}
+.reboot-btn{position:fixed;left:20px;bottom:20px;border-radius:999px;padding:13px 17px;box-shadow:0 5px 20px #0003;background:#e8e2d9;z-index:3}
+.bottom-actions{position:relative}
+@media(max-width:560px){
+  header{position:relative;padding:12px 14px 5px;background:#f5f3ef}
+  h1{font-size:22px}.sub{font-size:12px;line-height:1.35;margin-top:2px}
+  .wrap{padding:5px 12px 125px}
+  .toolbar{display:grid;grid-template-columns:minmax(0,0.9fr) minmax(0,1.6fr);gap:7px;margin:8px 0}
+  .toolbar input,.toolbar select{min-width:0;font-size:14px;padding:10px}
+  .mobile-note{font-size:11px;line-height:1.45;margin:5px 0 7px}
+  .secondary-hint{display:none}
+  .count-hint{margin:4px 0 6px}
+  .settings{margin-top:2px}
+  .settings summary{font-size:11px;padding:3px 0}
+  .settings .actions{margin-top:5px}
+  .settings button{font-size:12px;padding:8px 10px}
+  .reboot-btn{left:12px;bottom:10px;padding:10px 12px;font-size:12px;opacity:.96}
+  .fab{right:12px;bottom:10px;padding:12px 14px;font-size:13px}
+  .card{padding:13px;margin:8px 0}
+  .place{font-size:17px}
+  .memo{font-size:15px;line-height:1.6}
+}
 .modal{display:none;position:fixed;inset:0;background:#0005;z-index:5;padding:20px;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .sheet{max-width:700px;margin:4vh auto;background:#f8f6f2;border-radius:20px;padding:20px;max-height:92vh;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .sheet h2{margin-top:0}.grid{display:grid;gap:10px}
@@ -34,15 +56,18 @@ button.primary{background:#26231f;color:#fff}
 <input id="search" placeholder="美術館・展示・感想を検索…">
 <select id="museumFilter"><option value="">すべての館</option></select>
 </div>
-<div class="hint">同じ館の別の日・別イベントは、必ず別の「訪問記録」として保存します。既存記録への追記は「✏️ 再編集」から行います。</div>
-<div class="hint">🧠 壁打ち＝ちゃぴこと考えるためのメモ、🚀 REBOOT 56＝人生リブート計画へつなぐ振り返りメモをコピーします。</div>
-<div class="hint" id="count"></div>
-    <div class="hint" id="cloudStatus">☁️ クラウド：未設定</div>
-<div class="actions" style="justify-content:flex-start">
-  <button id="authBtn" onclick="openAuth()">☁️ クラウド設定・ログイン</button>
-  <button id="syncBtn" onclick="syncNow()" style="display:none">🔄 今すぐ同期</button>
-  <button id="logoutBtn" onclick="logoutCloud()" style="display:none">ログアウト</button>
-</div>
+<div class="hint mobile-note">同じ館の別の日・別イベントは、別の「訪問記録」として保存します。</div>
+<div class="hint secondary-hint">🧠 壁打ち＝ちゃぴこと考えるためのメモ、🚀 REBOOT 56＝人生リブート計画へつなぐ振り返りメモをコピーします。</div>
+<div class="hint count-hint" id="count"></div>
+<details class="settings">
+  <summary>クラウド設定</summary>
+  <div class="hint" id="cloudStatus">☁️ クラウド：未設定</div>
+  <div class="actions" style="justify-content:flex-start">
+    <button id="authBtn" onclick="openAuth()">☁️ クラウド設定・ログイン</button>
+    <button id="syncBtn" onclick="syncNow()" style="display:none">🔄 今すぐ同期</button>
+    <button id="logoutBtn" onclick="logoutCloud()" style="display:none">ログアウト</button>
+  </div>
+</details>
 </div></header>
 
 <main class="wrap" id="list"></main>
