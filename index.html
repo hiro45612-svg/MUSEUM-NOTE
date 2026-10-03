@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>美術館NOTE v0.15</title>
+<title>美術館NOTE v0.16</title>
 <style>
 *{box-sizing:border-box}
 body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:#f5f3ef;color:#272522}
@@ -15,7 +15,7 @@ input,textarea,select{width:100%;border:1px solid #ddd5ca;border-radius:12px;pad
 button{border:0;border-radius:12px;padding:10px 13px;font:inherit;cursor:pointer;background:#e8e2d9}
 button.primary{background:#26231f;color:#fff}
 .card{background:#fff;border:1px solid #e5ded4;border-radius:16px;padding:15px;margin:10px 0;box-shadow:0 2px 8px #00000008}
-.meta{font-size:12px;color:#7b746b}.place{font-size:18px;font-weight:700;margin:3px 0 8px}
+.meta{font-size:12px;color:#7b746b}.place{font-size:18px;font-weight:700;margin:3px 0 8px}.exhibition-title{font-size:17px;font-weight:700;line-height:1.45;margin:6px 0 9px}
 .memo{white-space:pre-wrap;line-height:1.65;margin:5px 0}.hint{font-size:12px;color:#777;margin:4px 0 12px}
 .empty{padding:35px 10px;text-align:center;color:#888}
 .settings{margin-top:8px}.settings summary{cursor:pointer;color:#777;font-size:12px;padding:5px 0;list-style:none}.settings summary::-webkit-details-marker{display:none}.settings summary::before{content:"⚙️ ";}.settings[open] summary{margin-bottom:6px}
@@ -39,6 +39,7 @@ button.primary{background:#26231f;color:#fff}
   .fab{right:12px;bottom:10px;padding:12px 14px;font-size:13px}
   .card{padding:13px;margin:8px 0}
   .place{font-size:17px}
+  .exhibition-title{font-size:18px;line-height:1.45;margin:7px 0 10px}
   .memo{font-size:15px;line-height:1.6}
 }
 .modal{display:none;position:fixed;inset:0;background:#0005;z-index:5;padding:20px;overflow-y:auto;-webkit-overflow-scrolling:touch}
@@ -156,7 +157,8 @@ function render(){
     return dc || (a.exhibition||'').localeCompare(b.exhibition||'','ja');
   }).map(r=>`
    <article class="card">
-    <div class="meta">📅 訪問 ${esc(r.date)}${r.exhibition?' ・ 🎨 '+esc(r.exhibition):' ・ 常設・館内'}</div>
+    <div class="meta">📅 訪問 ${esc(r.date)}</div>
+    ${r.exhibition?`<div class="exhibition-title">🎨 ${esc(r.exhibition)}</div>`:`<div class="exhibition-title" style="font-weight:500;color:#777">常設・館内</div>`}
     <div style="font-size:12px;color:#777;margin:8px 0 2px">💭 この訪問で感じたこと</div>
     ${r.notes.map(n=>`<div class="memo">・ ${esc(n)}</div>`).join('')}
     <div class="actions">
